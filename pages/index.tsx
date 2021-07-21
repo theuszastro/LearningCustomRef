@@ -1,10 +1,44 @@
-import styled from 'styled-components'
+import React, { useImperativeHandle, useRef } from 'react';
 
-const Title = styled.h1`
-  color: red;
-  font-size: 50px;
-`
+type ElementRefData = {
+   focus: () => void;
+   getValue: () => string;
+};
 
-export default function Home() {
-  return <Title>My page</Title>
-}
+const Element = (props: { reference: React.MutableRefObject<undefined | ElementRefData> }) => {
+   const inputRef = useRef<HTMLInputElement>(null);
+
+   const { reference } = props;
+
+   useImperativeHandle(reference, () => {
+      return {
+         focus: () => {
+            inputRef.current?.focus();
+         },
+         getValue: () => {
+            return inputRef.current?.value ?? '';
+         },
+      };
+   });
+
+   return (
+      <div>
+         <input ref={inputRef} />
+      </div>
+   );
+};
+
+const pages: React.FC = () => {
+   const elementRef = useRef<ElementRefData>();
+
+   return (
+      <div>
+         <Element reference={elementRef} />
+
+         <button onClick={() => elementRef.current?.focus()}>Focus</button>
+         <button onClick={() => alert(elementRef.current?.getValue())}>getValue</button>
+      </div>
+   );
+};
+
+export default pages;

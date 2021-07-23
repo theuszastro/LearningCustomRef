@@ -1,16 +1,14 @@
-import React, { useImperativeHandle, useRef } from 'react';
+import React, { useImperativeHandle, useRef, forwardRef } from 'react';
 
 type ElementRefData = {
    focus: () => void;
    getValue: () => string;
 };
 
-const Element = (props: { reference: React.MutableRefObject<undefined | ElementRefData> }) => {
+const Element = forwardRef<ElementRefData | undefined>((_, ref) => {
    const inputRef = useRef<HTMLInputElement>(null);
 
-   const { reference } = props;
-
-   useImperativeHandle(reference, () => {
+   useImperativeHandle(ref, () => {
       return {
          focus: () => {
             inputRef.current?.focus();
@@ -26,14 +24,14 @@ const Element = (props: { reference: React.MutableRefObject<undefined | ElementR
          <input ref={inputRef} />
       </div>
    );
-};
+});
 
 const pages: React.FC = () => {
    const elementRef = useRef<ElementRefData>();
 
    return (
       <div>
-         <Element reference={elementRef} />
+         <Element ref={elementRef} />
 
          <button onClick={() => elementRef.current?.focus()}>Focus</button>
          <button onClick={() => alert(elementRef.current?.getValue())}>getValue</button>
